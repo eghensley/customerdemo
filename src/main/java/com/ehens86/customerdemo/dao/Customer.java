@@ -13,43 +13,60 @@ import com.ehens86.customerdemo.enums.customer.StatusEnum;
 @Document
 public class Customer {
 
-    @Id
-    private String documentId;
+	@Id
+	private String documentId;
 
 	@Field
 	private String firstName;
-	
+
 	@Field
 	private String lastName;
-	
-    @Field("joinDate")
-    private Date date;
+
+	@Field("joinDate")
+	private Date date;
 
 	@Field
 	private StatusEnum status;
 
-    @Field
-    private EntityTypeEnum type;
-    
-    @Field
-    private Date dob;
+	@Field
+	private EntityTypeEnum type;
 
-    @Field
-    private GenderEnum gender;
-    
-    public Customer(String firstName, String lastName, Date date, StatusEnum status, EntityTypeEnum type, Date dob, GenderEnum gender) {
-    	this.firstName = firstName;
-    	this.lastName = lastName;
-    	this.date = date;
-        this.status = status;
-        this.type = type;
-        this.dob = dob;
-        this.gender = gender;
-    }
-    
-    public Customer() {
-    	
-    }
+	@Field
+	private Date dob;
+
+	@Field
+	private GenderEnum gender;
+
+	@Field
+	private String city;
+
+	public Customer(String firstName, String lastName, Date date, StatusEnum status, EntityTypeEnum type, Date dob,
+			GenderEnum gender, String city) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.date = date;
+		this.status = status;
+		this.type = type;
+		this.dob = dob;
+		this.gender = gender;
+		this.city = city;
+	}
+
+//	public Customer(String firstName, String lastName, Date date, String status, String type, Date dob,
+//			String gender, String city) {
+//		this.firstName = firstName;
+//		this.lastName = lastName;
+//		this.date = date;
+//		this.status = StatusEnum.valueOf(status.toUpperCase());
+//		this.type = EntityTypeEnum.valueOf(type.toUpperCase());
+//		this.dob = dob;
+//		this.gender = GenderEnum.valueOf(gender.toUpperCase());
+//		this.city = city;
+//	}
+	
+	public Customer() {
+
+	}
 
 	/**
 	 * @return the documentId
@@ -117,8 +134,8 @@ public class Customer {
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(StatusEnum status) {
-		this.status = status;
+	public void setStatus(String status) {
+		this.status = StatusEnum.valueOf(status.toUpperCase());
 	}
 
 	/**
@@ -131,8 +148,8 @@ public class Customer {
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(EntityTypeEnum type) {
-		this.type = type;
+	public void setType(String type) {
+		this.type = EntityTypeEnum.valueOf(type.toUpperCase());
 	}
 
 	/**
@@ -159,8 +176,22 @@ public class Customer {
 	/**
 	 * @param gender the gender to set
 	 */
-	public void setGender(GenderEnum gender) {
-		this.gender = gender;
+	public void setGender(String gender) {
+		this.gender = GenderEnum.valueOf(gender.toUpperCase());
 	}
-	
+
+	/**
+	 * @return the city
+	 */
+	public String getCity() {
+		return city;
+	}
+
+	/**
+	 * @param city the city to set
+	 */
+	public void setCity(String city) {
+		this.city = city;
+	}
+
 }

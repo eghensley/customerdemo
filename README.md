@@ -40,9 +40,23 @@
 	+ Create indexes on keys/conditions used for views
 	+ Couchbase supports comprehensive indexing (as opposed to MongoDB)
 		+ simple: single key in a document
+			+ ```sql 
+			CREATE INDEX document_type_idx
+ 			ON `customer-info`(type)
+ 			USING GSI;```
 		+ composite: multiple keys in a document
+			+ ```sql 
+			CREATE INDEX customer_name_idx
+			 ON `customer-info`(firstName, lastName)
+			 WHERE type = 'customer'
+			 USING GSI;```
 		+ functional: manipulated value for a key (UPPER())
 		+ partial: includes where condition for applying to index
+			+ ```sql 
+			CREATE INDEX customer_gender_idx
+			 ON `customer-info`(gender)
+			 WHERE type = 'customer'
+			 USING GSI;```
 		+ array: subquery of documents (DISTINCT())
 
 ## Model
@@ -69,13 +83,14 @@ CITY = {
 }
 
 CUSTOMER = {
-    'firstName': None,
-    'lastName': None,
-    'joinDate': None,
-    'status': None,
-    'dob': None,
+    'firstName': str,
+    'lastName': str,
+    'joinDate': str,
+    'status': str [bronze, silver, gold, platinum],
+    'dob': str,
     'type': 'customer',
-    'gender': None
+    'gender': str [male, female],
+    'city': str (many->one, city unique id)
 }
 
 RELATIONSHIP = {
@@ -99,9 +114,9 @@ RELATIONSHIP = {
 + Supports standard SQL 
 	+ AND, OR, NOT
 + ```SQL
-SELECT f.name
-FROM fights f 
-WHERE f.date < '2020-08-15 00:00:00'```
+select ci.* 
+	from `customer-info` ci 
+	where ci.type = 'city'```
 
 ### Joins/Limitations
 + Supports ANSI Joins
@@ -113,19 +128,42 @@ WHERE f.date < '2020-08-15 00:00:00'```
 		+ For each joined object produced, only the right-hand source objects of the ON clause attribute must be non-MISSING and value non-NULL
 		+ RIGHT OUTER JOIN is only supported when it's the only join in the query; or in a chain of joins, the RIGHT OUTER JOIN must be the first join in the chain
 + ```sql
-SELECT f.name eventName, l.city eventCity
-FROM fights f left join locations l on f.location = meta(l).id```
+select ci.*, s.* 
+	from `customer-info` ci 
+	inner join `customer-info` s 
+		on ci.state = META(s).id 
+	where ci.type = 'city'```
 
 ### Group By
 + GROUP BY works only on a group key or aggregate function
-+ ```SQL
-SELECT l.city,
-       COUNT(META(f).id) AS `count`
-FROM fights f LEFT
-    JOIN locations l ON f.location = META(l).id
-WHERE f.date < '2020-08-15 00:00:00'
-GROUP BY l.city```
+	+ ```SQL
+	select s.name stateName, count(meta(c).id) customerCount
+		from `customer-info` ci 
+		inner join `customer-info` s 
+			on ci.state = META(s).id 
+		inner join `customer-info` c
+			on c.city = META(ci).id
+		where ci.type = 'city'
+			and s.type = 'state'
+			and c.type = 'customer'
+		group by s.name```
 
 ### Collections
 + Supports standard SQL collection operators
-	+ ANY, EVERY, ARRAY, FIRST, EXISTS, IN, and WITHIN
+	+ ANY
+		+ ```sql
+		select r.*
+    	from `customer-info` r 
+    		where r.type = 'relationship'
+    		AND ANY cust IN customers SATISFIES cust = "customers::061-06-0661" END;```
+	+ EVERY
+	+ ARRAY
+		+ ```sql
+		select array cust for cust in customers END as customerRelationships
+			from `customer-info` r 
+			where r.type = 'relationship'
+				AND ANY cust IN customers SATISFIES cust = "customers::061-06-0661" END;```
+	+ FIRST
+	+ EXISTS
+	+ IN
+	+ WITHIN
