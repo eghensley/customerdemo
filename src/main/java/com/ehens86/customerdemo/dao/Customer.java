@@ -1,6 +1,7 @@
 package com.ehens86.customerdemo.dao;
 
 import java.sql.Date;
+import java.util.Objects;
 
 import org.springframework.data.couchbase.core.mapping.Document;
 
@@ -134,8 +135,8 @@ public class Customer {
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(String status) {
-		this.status = StatusEnum.valueOf(status.toUpperCase());
+	public void setStatus(StatusEnum status) {
+		this.status = status;
 	}
 
 	/**
@@ -148,8 +149,8 @@ public class Customer {
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(String type) {
-		this.type = EntityTypeEnum.valueOf(type.toUpperCase());
+	public void setType(EntityTypeEnum type) {
+		this.type = type;
 	}
 
 	/**
@@ -176,8 +177,8 @@ public class Customer {
 	/**
 	 * @param gender the gender to set
 	 */
-	public void setGender(String gender) {
-		this.gender = GenderEnum.valueOf(gender.toUpperCase());
+	public void setGender(GenderEnum gender) {
+		this.gender = gender;
 	}
 
 	/**
@@ -192,6 +193,33 @@ public class Customer {
 	 */
 	public void setCity(String city) {
 		this.city = city;
+	}
+
+	@Override
+	public String toString() {
+		return "Customer [documentId=" + documentId + ", firstName=" + firstName + ", lastName=" + lastName + ", date="
+				+ date + ", status=" + status + ", type=" + type + ", dob=" + dob + ", gender=" + gender + ", city="
+				+ city + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(city, date, dob, documentId, firstName, gender, lastName, status, type);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Customer)) {
+			return false;
+		}
+		Customer other = (Customer) obj;
+		return Objects.equals(city, other.city) && Objects.equals(date, other.date) && Objects.equals(dob, other.dob)
+				&& Objects.equals(documentId, other.documentId) && Objects.equals(firstName, other.firstName)
+				&& gender == other.gender && Objects.equals(lastName, other.lastName) && status == other.status
+				&& type == other.type;
 	}
 
 }

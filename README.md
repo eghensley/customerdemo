@@ -58,6 +58,58 @@
 			 WHERE type = 'customer'
 			 USING GSI;```
 		+ array: subquery of documents (DISTINCT())
+	+ All index creation is done asynchronously
+		+ GSI (global secondary index)
+		+ ```CREATE [PRIMARY] INDEX```
+		+ Uses B+ tree
+		+ Performance Benefits:
+			+ Advanced Scaling: GSIs can be assigned independently to selected nodes
+			+ Predictable Performance: Key-based operations maintain predictable low-latency
+			+ Low Latency Querying: GSIs independently partition into the Index Service nodes
+			+ Independent Partitioning: Data and its indexes can have different partition keys
++ Views
+	+ In addition to Indexing, views are also supported
+	+ user defined map and reduce function that can define arbitrarily complex logic for indexing
+	+ Map function can call the `emit()` function to generate an index item for the mutation being processed
+	+ Comparable to SQL "Materialized Views"
+		+ Query / Indexing is cached to allow quick retrieval
+		+ Also means that the views are updated with any update to the design document
+		+ Stored on disk, trade memory for performance
+	+ Supports "Spatial Views"
+		+ Use "R-tree" for geographic data
+	+ Performance Advantages:
+		+ Auto Partitioning of Indexes: Views come with auto partitioning and smart placement within the data service
+		+ Built-in replicas and HA for Indexing: Views come with built in replicas for high availability within the data service
+		+ Simple Scaling Model: Views are automatically placed and scaled with the data service
+	+ Best Practices
+		+ View quantity per design document
+			+ Ideally 1 view per design document, to avoid unnecessary updates
+		+ Modifying existing views
+			+ Modification requires rebuilding the entire view, so is very costly
+		+ Dont include document IDs
+			+ Automatically included from `META()`
+		+ Check document fields
+			+ First ensure the field exists before performing operation
+			+ ```
+			function(doc, meta)
+				{
+				  if (doc.ingredient)
+				  {
+				     emit(doc.ingredient.ingredtext, null);
+				  }
+				}```
+		+ View Size, disk storage and I/O
+			+ Size expands linearly with number of views
+			+ (% of docment viewed) x (number of views) x (size of document)
+		+ Include value data in views
+			+ Only include the minimum data required for querying
+		+ Use document types
+			+ Preemptively filter documents by type
+		+ Use built-in Reduce functions
+			+ highly optimized
+				+ `_sum`
+				+ `_count`
+
 
 ## Model
 ### Customer Information Toy Model
