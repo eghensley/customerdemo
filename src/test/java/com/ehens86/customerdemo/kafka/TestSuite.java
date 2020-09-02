@@ -1,4 +1,4 @@
-package com.ehens86.customerdemo.rest;
+package com.ehens86.customerdemo.kafka;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -6,6 +6,6 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
 
-{ CustomerControllerTest.class })
+{ KafkaConsumerTest.class })
 public class TestSuite { // nothing
 }

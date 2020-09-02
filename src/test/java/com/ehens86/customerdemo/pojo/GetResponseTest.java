@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import javax.annotation.Generated;
 
 import org.junit.Assert;
-import org.junit.Test;
 
 @Generated(value = "org.junit-tools-1.1.0")
 public class GetResponseTest {

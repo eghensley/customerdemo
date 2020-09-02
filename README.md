@@ -219,3 +219,117 @@ select ci.*, s.*
 	+ EXISTS
 	+ IN
 	+ WITHIN
+	
+	
+## Code Structure/Best Practices
+
+### Organization
+
++ App.java
++ dao
+	+ Foo.java
+	+ Bar.java
++ repository
+	+ FooRepository.java
+	+ BarRepository.java
++ service
+	+ FooService.java
+	+ BarService.java
++ rest
+	+ FooController.java
+	+ BarController.java
+	
+#### App.java
++ Main class which launches the application
++ Annoted with `@SpringBootApplication`
+
+#### dao
++ One DAO class per design document/view
++ Annoted with `@Document`
++ Requires both full and partial constructors
++ Include `toString`, `equals`, and `hashCode` methods
+	+ Annotated with `@Override`
++ One private method per JSON field
+	+ Annotated with `@Field`
+
+#### repository
++ One interface per DAO
++ Extend `CrudRepository<{Dao}, String>`
++ Define each query to be performed
+	+ Use N1QL notation
+
+#### service
++ One class per repository
++ Annotate with `@Service`
++ `private final {repository}`
++ Use a full constructor to inject dependency repository
+	+ Annotated with `@Autowired`
++ Wrap each method in try/catch
+
+#### rest
++ One class per service
++ Annotate with `@RestController`, `@RequestMapping({pathPrefix})`, and `@Api(value={swaggerDescription})`
++ Inject service dependency with `@Autowired`
++ One method per HTTP endpoint
+	+ Annotated with `@ApiOperation(value = {swaggerDefinition})`
+	+ Type of call defined with `@GetMapping({path})`, `@PostMapping({path})`, etc
+	+ Wrap each in try/catch
+	+ Define path variables with `@PathVariable`
+	+ Define body variables with `@RequestBody`
+	+ Define headers with `@RequestHeader`
+	
+### Testing
+
++ At LEAST one unit test per method, per class
++ One unit test per "branch" in a method's logic
+	+ ex) try/catch requires 2 unit tests: one for success one for caught error
++ JUnit for DAO class
++ Mockito for repository/service/controller
++ Use ```@RunWith(MockitoJUnitRunner.class)
+@SpringBootTest``` for DAO, repository, and service
++ Use ```@RunWith(SpringRunner.class)
+@WebMvcTest(value = {Controller}.class)``` for controller
+
+
+## Kafka
+
+### Configurations
+
+#### General
++ brokers: List of broker hosts to connect
+	+ optionally include port
+	+ default: localhost
++ defaultBrokerPort: default port to connect to
+	+ default: 9092
++ offsetUpdateTimeWindow: frequency (miliseconds) that offsets are saved
+	+ default: 10,000
++ offsetUpdateCount: number of updates that offsets are saved
+	+ mutually exclusive with `offsetUpdateTimeWindow`
+	+ default: 0
+	
+
+#### Consumer
++ autoRebalanceEnabled: if partitions are balanced between consumers.  If not, each consumer assigned a fixed set
+	+ default: True
++ autoCommitOffset: whether commits occur automatically, or must be sent through explicit acknowledgement header
+	+ default: True
++ autoCommitOnError: still commit the offset in event of an error
+	+ default: null
++ recoveryInterval: interval (milliseconds) for connection recovery attempts
+	+ default: 5000
++ startOffset: starting point for new consumers
+	+ available options:
+		+ earliest: start from the beginning
+		+ latest: start from most recent
+	+ default: earliest
++ enableDlq (dead letter queue): sends error messages to `error.<destination>.<group>`
+	+ default: false
+
+#### Producer
++ bufferSize: upper limit for data (bytes) that can be sent in a single batch
+	+ default: 16384
++ sync: if producer is synchonous
+	+ default: false
++ batchTimeout: how long the producer will wait between sending for larger batches
+	+ throughput vs latency
+	+ default: 0

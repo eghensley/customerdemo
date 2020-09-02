@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class CustomerService {
 	private final CustomerRepository customerRepo;
 	private final KafkaProducer kafkaProducer;
 	
+	@Autowired
 	public CustomerService(CustomerRepository customerRepo, KafkaProducer kafkaProducer) {
 		this.customerRepo = customerRepo;
 		this.kafkaProducer = kafkaProducer;
