@@ -1,5 +1,6 @@
 package com.ehens86.customerdemo.kafka;
 
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,7 +51,9 @@ public class KafkaConsumer {
 	public GeneralApiResponse pauseListener() {
 		String errorString = null;
 		try {
-			MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer("group_id");
+			Set<String> ids = kafkaListenerEndpointRegistry.getListenerContainerIds();
+			LOG.info(ids.toString());
+			MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer("listener_0");
 			listenerContainer.pause();
 			return new GeneralApiResponse(HttpStatus.OK, errorString);
 		} catch (Exception e) {
@@ -64,7 +67,7 @@ public class KafkaConsumer {
 		String errorString = null;
 
 		try {
-			MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer("group_id");
+			MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer("listener_0");
 			listenerContainer.resume();
 			return new GeneralApiResponse(HttpStatus.OK, errorString);
 		} catch (Exception e) {
@@ -74,7 +77,7 @@ public class KafkaConsumer {
 		}
 	}
 
-	@KafkaListener(topics = "test", groupId = "group_id")
+	@KafkaListener(topics = "test", groupId = "group_id", id = "listener_0")
 	public void consume(String message) throws Exception {
 		LOG.info(String.format("#### -> Consumed message -> %s", message));
 		try {
